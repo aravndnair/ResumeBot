@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resume Insights</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body class="bg-[#fcfbf8] font-sans">
+  <div class="px-10 py-6 max-w-3xl mx-auto">
+    <h2 class="text-3xl font-bold text-center text-[#1c170d] mb-4">Upload Your Resume</h2>
+    <p class="text-center text-[#1c170d] mb-8">Get instant feedback and insights on your resume.</p>
+
+    <form id="resumeForm" enctype="multipart/form-data" class="space-y-6">
+      <!-- File Upload -->
+      <label class="block text-[#1c170d] font-semibold">Upload Resume (PDF):</label>
+      <input type="file" name="resume" accept="application/pdf" required class="border border-[#e8e1cf] rounded-lg p-2 w-full bg-white">
+
+      <!-- Question Textarea -->
+      <label class="block text-[#1c170d] font-semibold">Ask a Question:</label>
+      <textarea name="question" rows="6" placeholder="What are my key skills?" required class="border border-[#e8e1cf] rounded-lg p-3 w-full bg-white placeholder:text-[#9b844b]"></textarea>
+
+      <!-- Submit Button -->
+      <div class="text-center">
+        <button type="submit" class="bg-[#f4c653] text-[#1c170d] font-bold py-2 px-6 rounded-lg hover:opacity-90">
+          Submit
+        </button>
+      </div>
+    </form>
+
+    <!-- Result Display -->
+    <div id="result" class="mt-6 text-center text-[#1c170d] font-semibold"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('resumeForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      resultDiv.textContent = 'Processing...';
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/ask', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.answer) {
+          resultDiv.textContent = "Answer: " + data.answer;
+        } else if (data.error) {
+          resultDiv.textContent = "Error: " + data.error;
+        } else {
+          resultDiv.textContent = "Unexpected response";
+        }
+      } catch (err) {
+        resultDiv.textContent = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
